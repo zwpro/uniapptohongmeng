@@ -1,0 +1,43 @@
+/**
+ * interface.uts
+ * uts插件接口定义文件，按规范定义接口文件可以在HBuilderX中更好的做到语法提示
+ */
+ 
+/**
+ * myApi 异步函数的参数，在type里定义函数需要的参数以及api成功、失败的相关回调函数。
+ */
+export type MyApiOptions = {
+    fullUrl : string,
+    renameUrl : string,
+    fileType : string,
+    success ?: (res : MyApiResult) => void,
+    fail ?: (res : string) => void,
+    progress ?: (res : any) => void,
+}
+ 
+/**
+ * 函数返回结果
+ * 可以是void, 基本数据类型，自定义type, 或者其他类型。
+ * [可选实现]
+ */
+export type MyApiResult = {
+    fieldA : number,
+    fieldB : boolean,
+    fieldC : string
+}
+ 
+/**
+ * 函数返回结果
+ * 可以是void, 基本数据类型，自定义type, 或者其他类型。
+ * [可选实现]
+ */
+export type MyApiFail = {
+    errMessage : string
+}
+ 
+ 
+/* 异步函数定义 */
+export type MyApi = (options : MyApiOptions) => void
+ 
+/* 同步函数定义 */
+export type MyApiSync = (fullUrl : string) => MyApiResult

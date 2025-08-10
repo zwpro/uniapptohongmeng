@@ -1,0 +1,120 @@
+/* 引入 interface.uts 文件中定义的变量 */
+import { MyApiOptions, MyApi } from '../interface.uts';
+ 
+import request from '@ohos.request'; // 下载
+import { fileUri } from '@kit.CoreFileKit'; // 获取getUriFromPath
+import { photoAccessHelper } from '@kit.MediaLibraryKit'; // 保存到相册
+import fs, { ReadOptions, WriteOptions } from '@ohos.file.fs';
+import dataSharePredicates from '@ohos.data.dataSharePredicates';
+ 
+// 1.是否同意下载-->同意:获取需要保存到媒体库的位于应用沙箱的媒体uri 
+// 2.文件下载-->progress:98%
+// 3.已下载的沙箱文件写入已获取的媒体uri文件中-->progress:100%
+ 
+export const hmDownloadToSystemAlbum : MyApi = async function (options : MyApiOptions) {
+    let context : Context = getContext();
+    let phAccessHelper = photoAccessHelper.getPhotoAccessHelper(context);
+    let filesDir = context.filesDir;
+    let cfg : request.DownloadConfig = {
+        url: options.fullUrl,
+        filePath: filesDir + '/' + options.renameUrl,
+        enableMetered: true
+    }
+    let downloadTask : request.DownloadTask;
+ 
+    // 1.是否同意下载-->同意:获取需要保存到媒体库的位于应用沙箱的图片/视频uri
+    try {
+        let srcFileUri : string = fileUri.getUriFromPath(cfg.filePath) || '';
+        let srcFileUris : Array<string> = [srcFileUri];
+ 
+        let fileType : photoAccessHelper.PhotoType = photoAccessHelper.PhotoType.IMAGE;
+        if (options.fileType === 'photo') fileType = photoAccessHelper.PhotoType.IMAGE;
+        if (options.fileType === 'video') fileType = photoAccessHelper.PhotoType.VIDEO;
+        let photoCreationConfigs : Array<photoAccessHelper.PhotoCreationConfig> = [
+            {
+                title: options.renameUrl.split('.')[0] || '', // 可选-图片或者视频的标题，例如'test2'
+                fileNameExtension: options.renameUrl.split('.').pop() || '', // 必填-文件扩展名，例如'jpg'
+                photoType: fileType, // 必填-创建的文件类型，IMAGE或者VIDEO
+                subtype: photoAccessHelper.PhotoSubtype.DEFAULT, // 可选-图片或者视频的文件子类型，DEFAULT[默认照片类型]或者MOVING_PHOTO[动态照片文件类型]
+            }
+        ];
+ 
+        let desFileUris : Array<string> = await phAccessHelper.showAssetsCreationDialog(srcFileUris, photoCreationConfigs);
+        let URI = desFileUris[0];
+ 
+        // 2.文件下载98%
+        if (desFileUris.length > 0) {
+            let progressNum : number = 0;
+            options?.progress?.(progressNum);
+ 
+            try {
+                request.downloadFile(context.getApplicationContext(), cfg
+                    , (err, data) => {
+                        if (err) {
+                            console.error('Failed to request the download. Cause: ' + JSON.stringify(err));
+                            return;
+                        }
+                        downloadTask = data;
+ 
+                        // 进度条
+                        let progressCallback = (receivedSize : number, totalSize : number) => {
+                            // console.info("download receivedSize:" + receivedSize + " totalSize:" + totalSize);
+                            let numA : number = Math.round((totalSize / 98));
+                            let numB : number = Math.round((receivedSize / numA));
+                            options?.progress?.(numB);
+                        };
+                        downloadTask.on('progress', progressCallback);
+ 
+                        // 下载完成
+                        downloadTask.on("complete", async () => {
+                            // console.log('下载完成', JSON.stringify(options));
+                            try {
+                                // 判定文件是否存在
+                                if (fs.accessSync(URI)) {
+                                    // 删除文件
+                                    fs.unlinkSync(URI)
+                                }
+ 
+                                let srcFile = fs.openSync(cfg.filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
+                                let destFile = fs.openSync(URI, fs.OpenMode.READ_WRITE);
+                                // 读取源文件内容并写入至目的文件
+                                let bufSize = 4096;
+                                let readSize = 0;
+                                let buf = new ArrayBuffer(bufSize);
+                                let readOptions : ReadOptions = {
+                                    offset: readSize,
+                                    length: bufSize
+                                };
+                                let readLen = fs.readSync(srcFile.fd, buf, readOptions);
+                                while (readLen > 0) {
+                                    readSize += readLen;
+                                    let writeOptions : WriteOptions = {
+                                        length: readLen
+                                    };
+                                    fs.writeSync(destFile.fd, buf, writeOptions);
+                                    readOptions.offset = readSize;
+                                    readLen = fs.readSync(srcFile.fd, buf, readOptions);
+                                }
+                                // 关闭文件
+                                fs.closeSync(srcFile);
+                                fs.closeSync(destFile);
+ 
+                                return options?.progress?.(100);
+                            } catch (e) {
+                                //TODO handle the exception
+                                options?.fail?.('下载失败，请重试');
+                            }
+                        })
+                    });
+            } catch (err) {
+                options?.fail?.('下载失败，请重试');
+                console.error('err.code : ' + err.code + ', err.message : ' + err.message);
+            }
+        } else {
+            // 取消授权
+            options?.fail?.('已取消');
+        }
+    } catch (err) {
+        console.error('showAssetsCreationDialog failed, errCode is ' + err.code + ', errMsg is ' + err.message);
+    }
+}

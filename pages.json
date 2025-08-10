@@ -1,0 +1,87 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "表情包大全"
+			}
+		},
+		{
+		  "path" : "pages/album/album",
+		  "style" : 
+		  {
+		    "navigationBarTitleText" : "表情包专辑"
+		  }
+		},
+		{
+		  "path" : "pages/search/search",
+		  "style" : 
+		  {
+		    "navigationBarTitleText" : ""
+		  }
+		},
+		{
+		  "path" : "pages/detail/detail",
+		  "style" : 
+		  {
+		    "navigationBarTitleText" : ""
+		  }
+		},
+		{
+		  "path" : "pages/album/list",
+		  "style" : 
+		  {
+		    "navigationBarTitleText" : ""
+		  }
+		},
+		{
+		  "path" : "pages/webview/ys",
+		  "style" : 
+		  {
+		    "navigationBarTitleText" : ""
+		  }
+		},
+		{
+		  "path" : "pages/webview/yh",
+		  "style" : 
+		  {
+		    "navigationBarTitleText" : ""
+		  }
+		}
+	],
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF7200",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "表情包",
+        "iconPath": "static/tabbar/home.png",
+        "selectedIconPath": "static/tabbar/homeSel.png"
+      },
+      {
+        "pagePath": "pages/album/album",
+        "text": "专辑",
+        "iconPath": "static/tabbar/album.png",
+        "selectedIconPath": "static/tabbar/albumSel.png"
+      },
+      {
+        "pagePath": "pages/search/search",
+        "text": "搜索",
+        "iconPath": "static/tabbar/search.png",
+        "selectedIconPath": "static/tabbar/searchSel.png"
+      }
+    ]
+  },
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8",
+    "h5":{
+    	 "titleNView":false
+    }
+	},
+	"uniIdRouter": {}
+}

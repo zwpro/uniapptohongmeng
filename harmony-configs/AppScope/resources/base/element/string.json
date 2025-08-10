@@ -1,0 +1,12 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "表情包搜索助手"
+    },
+    {
+      "name": "get_networkinfo_tips",
+      "value": "需要网络处理"
+    }
+  ]
+}

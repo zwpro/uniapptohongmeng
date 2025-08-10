@@ -1,0 +1,80 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "storePassword": "你的storePassword",
+          "certpath": "你的certpath",
+          "keyAlias": "你的keyAlias",
+          "keyPassword": "你的keyPassword",
+          "profile": "你的profile",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "你的storeFile"
+        }
+      },
+      {
+        "name": "release",
+        "type": "HarmonyOS",
+        "material": {
+          "storePassword": "你的storePassword",
+          "certpath": "你的certpath",
+          "keyAlias": "你的keyAlias",
+          "keyPassword": "你的keyPassword",
+          "profile": "你的profile",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "你的storeFile"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "compatibleSdkVersion": "5.0.1(13)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true  
+          }
+        }
+      },
+      {
+        "name": "release",
+        "signingConfig": "release",
+        "compatibleSdkVersion": "5.0.1(13)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true  
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug",
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}

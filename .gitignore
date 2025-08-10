@@ -1,0 +1,9 @@
+node_modules/
+unpackage/
+.hbuilderx/
+.DS_Store
+.vscode/
+*.log
+dist/ 
+.history
+vue-global-types.d.ts
